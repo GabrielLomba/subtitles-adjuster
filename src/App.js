@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import Download from '@axetroy/react-download';
+
 import './App.css';
 import { processTimingChange } from './SrtFileService';
 
@@ -10,14 +12,22 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
+      srtFileName: null,
       srtFileData: null,
+      strProcessedData: null,
       timingChange: 0,
       error: ''
     }
   }
 
-  handleChosenFile = (file) => {
+  resetState = () => {
     this.setState({ error: null });
+    this.setState({ strProcessedData: null });
+  }
+
+  handleChosenFile = (file) => {
+    this.resetState();
+    this.setState({ srtFileName: file.name });
 
     const fileReader = new FileReader();
     fileReader.onloadend = () => {
@@ -28,6 +38,11 @@ class App extends Component {
     }
 
     fileReader.readAsText(file);
+  }
+
+  handleTimingChange = (newTimingChange) => {
+    this.resetState();
+    this.setState({ timingChange: Number(newTimingChange) });
   }
 
   validateInput = () => {
@@ -47,14 +62,23 @@ class App extends Component {
   processDataIfValid = () => {
     try {
       this.validateInput();
-      processTimingChange(this.state.srtFileData, this.state.timingChange);
+      const strProcessedData = processTimingChange(this.state.srtFileData, this.state.timingChange);
+      this.setState({ strProcessedData });
     } catch (err) {
       this.setState({ error: err.message });
     }
   }
 
+  getProcessedFileName = () => {
+    const { srtFileName, timingChange } = this.state;
+
+    const [name] = srtFileName.slice(0, srtFileName.lastIndexOf('.'));
+
+    return `${name}Processed${timingChange}.srt`;
+  }
+
   render() {
-    const { error } = this.state;
+    const { error, strProcessedData } = this.state;
 
     return (
       <div className="App">
@@ -72,8 +96,13 @@ class App extends Component {
 
           <div className="App-change">
             <label>Timing change applied in ms</label>
-            <input type="number" max={MAX_TIMING_CHANGE} onChange={ev => this.setState({ timingChange: Number(ev.target.value) })} />
-            <button onClick={this.processDataIfValid}>Apply!</button>
+            <input type="number" max={MAX_TIMING_CHANGE} onChange={ev => this.handleTimingChange(ev.target.value)} />
+            <button onClick={this.processDataIfValid}>Proccess!</button>
+
+            {strProcessedData ? (
+              <Download file={this.getProcessedFileName()} content={strProcessedData}>
+                <button type="button">Download file!</button>
+              </Download>) : null}
 
             {error ? <p className="App-error">{error}</p> : null}
           </div>

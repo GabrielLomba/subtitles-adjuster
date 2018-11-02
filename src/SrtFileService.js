@@ -58,4 +58,6 @@ export const processTimingChange = (fileData, timingMsChange) => {
       fileLines[i] = parts.join(' ');
     }
   }
+
+  return fileLines.join('\n');
 }
