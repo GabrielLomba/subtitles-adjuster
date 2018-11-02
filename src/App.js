@@ -20,28 +20,38 @@ class App extends Component {
     }
   }
 
-  resetState = () => {
+  resetGeneralState = () => {
     this.setState({ error: null });
     this.setState({ strProcessedData: null });
   }
 
+  resetFileState = () => {
+    this.setState({ srtFileName: null });
+    this.setState({ srtFileData: null });
+  }
+
   handleChosenFile = (file) => {
-    this.resetState();
-    this.setState({ srtFileName: file.name });
+    this.resetGeneralState();
 
-    const fileReader = new FileReader();
-    fileReader.onloadend = () => {
-      this.setState({ srtFileData: fileReader.result });
-    }
-    fileReader.onerror = error => {
-      this.setState({ error });
-    }
+    if (file) {
+      this.setState({ srtFileName: file.name });
 
-    fileReader.readAsText(file);
+      const fileReader = new FileReader();
+      fileReader.onloadend = () => {
+        this.setState({ srtFileData: fileReader.result });
+      }
+      fileReader.onerror = error => {
+        this.setState({ error });
+      }
+
+      fileReader.readAsText(file);
+    } else {
+      this.resetFileState();
+    }
   }
 
   handleTimingChange = (newTimingChange) => {
-    this.resetState();
+    this.resetGeneralState();
     this.setState({ timingChange: Number(newTimingChange) });
   }
 
@@ -72,7 +82,7 @@ class App extends Component {
   getProcessedFileName = () => {
     const { srtFileName, timingChange } = this.state;
 
-    const [name] = srtFileName.slice(0, srtFileName.lastIndexOf('.'));
+    const name = srtFileName.slice(0, srtFileName.lastIndexOf('.'));
 
     return `${name}Processed${timingChange}.srt`;
   }
@@ -83,31 +93,37 @@ class App extends Component {
     return (
       <div className="App">
         <header>
-          <p>
-            Simple app that adjusts subtitles timing in SRT files.
+          <p className="header">
+            Simple app that adjusts subtitles timing in SRT files. Thanks for using!
           </p>
         </header>
-        <div className="App-content">
 
-          <div className="App-input">
+        <main>
+
+          <div className="file-input">
             <label>Select the SRL file:</label>
             <input type="file" accept=".srt" onChange={ev => this.handleChosenFile(ev.target.files[0])} />
           </div>
 
-          <div className="App-change">
+          <div className="timing-change">
             <label>Timing change applied in ms</label>
             <input type="number" max={MAX_TIMING_CHANGE} onChange={ev => this.handleTimingChange(ev.target.value)} />
             <button onClick={this.processDataIfValid}>Proccess!</button>
 
             {strProcessedData ? (
               <Download file={this.getProcessedFileName()} content={strProcessedData}>
-                <button type="button">Download file!</button>
+                <button type="button">Download processed file!</button>
               </Download>) : null}
 
-            {error ? <p className="App-error">{error}</p> : null}
+            {error ? <p className="error">{error}</p> : null}
           </div>
 
-        </div>
+        </main>
+
+        <footer>
+          Let me know if you have any issues <a href="https://github.com/GabrielLomba/subtitles-adjuster/issues">here</a>.
+          Author: <a href="https://github.com/GabrielLomba">Gabriel Lomba</a>
+        </footer>
       </div>
     );
   }
