@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 class App extends Component {
@@ -7,19 +6,24 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
           <p>
-            Edit <code>src/App.js</code> and save to reload.
+            Simple app that adjusts subtitles timing in SRL files.
           </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
         </header>
+        <div className="App-content">
+          <div className="App-input">
+            <input type="file" />
+            <textarea />
+          </div>
+          <div className="App-change">
+            <label>Timing change applied</label>
+            <input type="number" />
+          </div>
+          <div className="App-output">
+            <input type="file" />
+            <textarea />
+          </div>
+        </div>
       </div>
     );
   }
