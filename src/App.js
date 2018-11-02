@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import './App.css';
 import { processTimingChange } from './SrtFileService';
 
+const MAX_TIMING_CHANGE = 10 * 60 * 60 * 1000;
+
 class App extends Component {
 
   constructor() {
@@ -19,7 +21,7 @@ class App extends Component {
 
     const fileReader = new FileReader();
     fileReader.onloadend = () => {
-      this.setState({ srlFileData: fileReader.result });
+      this.setState({ srtFileData: fileReader.result });
     }
     fileReader.onerror = error => {
       this.setState({ error });
@@ -28,11 +30,26 @@ class App extends Component {
     fileReader.readAsText(file);
   }
 
+  validateInput = () => {
+    if (!this.state.srtFileData) {
+      throw new Error("Please submit a SRT file before applying!");
+    }
+
+    if (!this.state.timingChange) {
+      throw new Error("Please specify a timing change before applying!");
+    }
+
+    if (this.state.timingChange > MAX_TIMING_CHANGE) {
+      throw new Error(`Please specify a timing change less than or equal to ${MAX_TIMING_CHANGE}!`);
+    }
+  }
+
   processDataIfValid = () => {
-    if (this.state.srtFileData) {
+    try {
+      this.validateInput();
       processTimingChange(this.state.srtFileData, this.state.timingChange);
-    } else {
-      this.setState({ error: "Please submit a SRT file before applying!" });
+    } catch (err) {
+      this.setState({ error: err.message });
     }
   }
 
@@ -54,8 +71,8 @@ class App extends Component {
           </div>
 
           <div className="App-change">
-            <label>Timing change applied</label>
-            <input type="number" onChange={value => this.setState({ timingChange: value })} />
+            <label>Timing change applied in ms</label>
+            <input type="number" max={MAX_TIMING_CHANGE} onChange={ev => this.setState({ timingChange: Number(ev.target.value) })} />
             <button onClick={this.processDataIfValid}>Apply!</button>
 
             {error ? <p className="App-error">{error}</p> : null}
