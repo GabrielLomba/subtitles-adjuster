@@ -101,12 +101,15 @@ class App extends Component {
         <main>
 
           <div className="file-input">
-            <label>Select the SRL file:</label>
+            <label>Select the SRT file:</label>
             <input type="file" accept=".srt" onChange={ev => this.handleChosenFile(ev.target.files[0])} />
           </div>
 
           <div className="timing-change">
             <label>Timing change applied in ms</label>
+            <p className="timing-change-explanation">
+              For instance, if the subtitles are 2 seconds late, put 2000. If they are 1.5 seconds early, put -1500.
+            </p>
             <input type="number" max={MAX_TIMING_CHANGE} onChange={ev => this.handleTimingChange(ev.target.value)} />
             <button onClick={this.processDataIfValid}>Proccess!</button>
 

@@ -32,6 +32,10 @@
   align-items: center;
 }
 
+.timing-change-explanation {
+  font-size: 14px;
+}
+
 button {
   margin-top: 15px;
   padding: 5px;
